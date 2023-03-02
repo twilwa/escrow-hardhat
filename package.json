@@ -19,7 +19,12 @@
     "> 5%"
   ],
   "dependencies": {
+    "@walletconnect/web3wallet": "^1.4.0",
+    "@web3modal/ethereum": "^2.1.2",
+    "@web3modal/react": "^2.1.2",
+    "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
-    "react": "^18.2.0"
+    "react": "^18.2.0",
+    "wagmi": "^0.11.7"
   }
 }
