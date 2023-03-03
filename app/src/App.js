@@ -2,7 +2,9 @@ import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import deploy from "./deploy";
 import Escrow from "./Escrow";
-import { Web3Modal } from "@web3modal/react";
+import { useAccount } from "wagmi";
+// import { provider } from "./index.js";
+import reportWebVitals from "./reportWebVitals";
 import {
   EthereumClient,
   modalConnectors,
@@ -10,19 +12,20 @@ import {
 } from "@web3modal/ethereum";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { arbitrum, mainnet, polygon } from "wagmi/chains";
+import { Web3Modal } from "@web3modal/react";
+import { Web3Button } from "@web3modal/react";
+import { Web3NetworkSwitch } from "@web3modal/react";
 
 const chains = [arbitrum, mainnet, polygon];
-
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-// Wagmi client
+const projectId = process.env.REACT_APP_PROJECT_ID;
 const { provider } = configureChains(chains, [
-  walletConnectProvider({ projectId: process.env.PROJECT_ID }),
+  walletConnectProvider({ projectId: projectId }),
 ]);
+
 const wagmiClient = createClient({
   autoConnect: true,
   connectors: modalConnectors({
-    projectId: "<YOUR_PROJECT_ID>",
+    projectId: projectId,
     version: "2",
     appName: "web3Modal",
     chains,
@@ -42,6 +45,7 @@ function App() {
   const [escrows, setEscrows] = useState([]);
   const [account, setAccount] = useState();
   const [signer, setSigner] = useState();
+  const { address, isConnected } = useAccount();
 
   useEffect(() => {
     async function getAccounts() {
@@ -84,6 +88,28 @@ function App() {
 
   return (
     <>
+      {isConnected ? (
+        <div>Current Depositor Address: {address}</div>
+      ) : (
+        <Web3Button />
+      )}
+
+      <Web3NetworkSwitch />
+
+      <Web3Modal projectId={projectId} ethereumClient={ethereumClient}>
+        {({ provider, accounts, chainId, ...rest }) => {
+          // Render a button that initiates a connection with the user's wallet
+          return (
+            <button
+              onClick={() => {
+                console.log("Web3Modal button clicked");
+              }}
+            >
+              Connect Wallet
+            </button>
+          );
+        }}
+      </Web3Modal>
       <div className="contract">
         <h1> New Contract </h1>
         <label>
